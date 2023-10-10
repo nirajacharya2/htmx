@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <title>htmx</title>
+    <style>
+        .htmx-swapping {
+            color: green;
+            opacity: 0;
+            transition: opacity 1s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="container">
+        <div id="todo-list" hx-get="/taskList" hx-trigger="load"></div>
+        <div id="ws" hx-ws="connect:/ws" hx-trigger="task">
+            <form
+              id="myForm"
+              hx-ws="send:submit"
+              hx-target="#todo-list"
+              hx-swap="beforeend"
+            >
+              <input type="text" name="task" required />
+              <input type="submit" value="save ws" />
+            </form>
+          </div>
+    </div>
+</body>
+
+</html>
