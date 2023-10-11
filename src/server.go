@@ -69,7 +69,7 @@ func getTODO() string {
 		lineNum1++
 		task += `
 		<div hx-boost="true" class="new-element"> 
-			<a href="/task/` + fileScanner.Text() + `">` + fileScanner.Text() +`</a>
+			<a href="/task/` + fileScanner.Text() + `">` + fileScanner.Text() + `</a>
 			<form hx-trigger="click" hx-delete="/delete" hx-target="closest .new-element" hx-swap="outerHTML swap:1s">
 				<input  type="hidden" name="task" value="` + fileScanner.Text() + `"/>
 				delete
@@ -260,6 +260,25 @@ func (s *Server) broadcast(text string) {
 	}
 }
 
+func edit(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	deleteLineFromFile("database.txt", r.FormValue("old"))
+	storeTODO(r.FormValue("task"))
+	fmt.Println(r.FormValue("task"))
+	fmt.Println(r.FormValue("old"))
+
+	io.WriteString(w, `
+						<div>`+r.FormValue("task")+`</div>
+							<form id="myForm2" hx-put="/edit" hx-target="#app">
+									<input type="text" name="task" required />
+									<input type="hidden" name="old" value="`+r.FormValue("task")+`"/>
+									<input type="submit" value="edit" />
+							</form>
+						</div>
+	
+	`)
+}
+
 func main() {
 	server := NewServer()
 
@@ -268,6 +287,7 @@ func main() {
 	http.HandleFunc("/taskList", listTask)
 	http.HandleFunc("/task/", getTaskPage)
 	http.HandleFunc("/delete", removeTask)
+	http.HandleFunc("/edit", edit)
 
 	http.Handle("/ws", websocket.Handler(server.websocketHandler))
 
